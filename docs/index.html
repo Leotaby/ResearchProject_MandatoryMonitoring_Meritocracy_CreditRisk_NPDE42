@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandatory Monitoring, Meritocracy &amp; Credit Risk — NPDE 42° Dashboard</title>
+<meta name="description" content="Interactive dashboard previewing the PhD proposal: Mandatory Monitoring, Meritocracy, and Credit Risk in Italian Private Firms. NPDE 42° cycle, University of Naples Federico II.">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060911;--surface:#0f1320;--card:#131829;
+  --border:rgba(255,255,255,.07);--border-hi:rgba(124,131,255,.35);
+  --text:#e5e7ef;--muted:#8892a8;
+  --accent:#7c83ff;--blue:#5aa2ff;--red:#ff6b6b;--green:#39d98a;--amber:#ffca5c;
+  --shadow:0 12px 40px rgba(0,0,0,.45);--radius:16px;
+  --h1:clamp(1.3rem,1rem+1.2vw,1.9rem);--h2:clamp(1.05rem,.95rem+.5vw,1.25rem);
+  --body:.88rem;--small:.78rem;
+}
+body{
+  font-family:"DM Sans",system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.55;min-height:100vh;
+}
+/* animated bg orbs */
+.bg-orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg-orbs span{position:absolute;border-radius:50%}
+.bg-orbs .o1{top:-18%;left:-8%;width:50%;height:50%;background:radial-gradient(circle,rgba(124,131,255,.12),transparent 70%);animation:f1 22s ease-in-out infinite}
+.bg-orbs .o2{bottom:-14%;right:-4%;width:42%;height:42%;background:radial-gradient(circle,rgba(236,72,153,.07),transparent 70%);animation:f2 26s ease-in-out infinite}
+.bg-orbs .o3{top:28%;right:18%;width:28%;height:28%;background:radial-gradient(circle,rgba(34,211,238,.06),transparent 70%);animation:f3 19s ease-in-out infinite}
+@keyframes f1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(55px,35px) scale(1.1)}}
+@keyframes f2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-45px,-25px) scale(1.12)}}
+@keyframes f3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-25px,40px) scale(1.06)}}
+
+header{position:relative;z-index:1;padding:2.8rem 1.5rem 1.5rem;text-align:center}
+.hero{max-width:960px;margin:0 auto;background:linear-gradient(135deg,rgba(124,131,255,.14),rgba(90,162,255,.07));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:2rem 1.5rem;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+header h1{font-size:var(--h1);font-weight:800;letter-spacing:-.03em;margin-bottom:.45rem;background:linear-gradient(135deg,#e0e7ff,#818cf8 45%,#f0abfc 75%,#e0e7ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--muted);font-size:var(--body);max-width:800px;margin:0 auto;line-height:1.65}
+.badges{margin-top:1rem;display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:.4rem;padding:.28rem .7rem;border-radius:999px;font-size:.72rem;font-weight:600;border:1px solid var(--border);background:rgba(255,255,255,.03)}
+.badge .dot{width:8px;height:8px;border-radius:999px}
+
+nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(6,9,17,.78);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.navwrap{max-width:1200px;margin:0 auto;padding:.7rem 1rem;display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
+nav button{background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--muted);padding:.52rem 1.05rem;border-radius:11px;cursor:pointer;font-size:.84rem;font-family:inherit;transition:all .15s}
+nav button:hover{transform:translateY(-1px);border-color:var(--border-hi)}
+nav button.active{background:rgba(124,131,255,.18);color:var(--text);border-color:var(--border-hi)}
+nav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.container{max-width:1200px;margin:0 auto;padding:1.2rem 1rem 2.8rem;position:relative;z-index:1}
+.panel{display:none}.panel.active{display:block}
+.card{background:rgba(19,24,41,.6);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.4rem 1.3rem;margin-bottom:1.3rem}
+.card h2{font-size:var(--h2);font-weight:700;margin-bottom:.2rem}
+.card h3{font-size:var(--small);color:var(--muted);font-weight:500;margin-bottom:1rem}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.85rem;margin-bottom:1.1rem}
+.kpi{background:rgba(10,13,22,.55);border:1px solid var(--border);border-radius:13px;padding:.9rem .85rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.kpi .num{font-size:1.45rem;font-weight:800;background:linear-gradient(135deg,var(--accent),#e0e7ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.kpi .lbl{margin-top:.15rem;color:var(--muted);font-size:.72rem;font-weight:500;letter-spacing:.03em;text-transform:uppercase}
+
+.section-note{color:var(--muted);font-size:var(--small);margin-top:.75rem;font-style:italic}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.8rem;margin-bottom:.9rem;align-items:end}
+.ctrl{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:12px;padding:.75rem}
+.ctrl label{display:block;font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:.35rem;letter-spacing:.03em}
+.ctrl select,.ctrl input[type=range]{width:100%}
+.ctrl select{background:rgba(6,9,17,.8);color:var(--text);border:1px solid var(--border);padding:.4rem .6rem;border-radius:10px;font-size:.84rem;font-family:inherit}
+.range-row{display:grid;grid-template-columns:1fr auto;gap:.6rem;align-items:center}
+.val{font-variant-numeric:tabular-nums;font-size:.85rem;font-weight:700;color:var(--accent);min-width:46px;text-align:right}
+input[type=range]{-webkit-appearance:none;background:rgba(148,163,184,.1);border-radius:4px;height:4px;outline:none;accent-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:880px){.row{grid-template-columns:1fr}}
+.plot{width:100%;min-height:390px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:rgba(19,24,41,.3)}
+
+footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.76rem;border-top:1px solid var(--border);position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs"><span class="o1"></span><span class="o2"></span><span class="o3"></span></div>
+
+<header>
+<div class="hero">
+  <h1>Mandatory Monitoring, Meritocracy &amp; Credit Risk in Italian Private Firms</h1>
+  <p>Interactive dashboard for the NPDE 42° cycle PhD proposal — all data are synthetic. Each tab corresponds to a core identification strategy in the proposal.</p>
+  <div class="badges">
+    <span class="badge"><span class="dot" style="background:var(--accent)"></span>RD Design</span>
+    <span class="badge"><span class="dot" style="background:var(--blue)"></span>DiD / TWFE</span>
+    <span class="badge"><span class="dot" style="background:var(--amber)"></span>Credit Risk</span>
+    <span class="badge"><span class="dot" style="background:var(--green)"></span>Monte Carlo</span>
+  </div>
+</div>
+</header>
+
+<nav><div class="navwrap" id="nav">
+  <button class="active" data-tab="overview">Overview</button>
+  <button data-tab="rd">RD Analysis</button>
+  <button data-tab="did">DiD / Event Study</button>
+  <button data-tab="credit">Credit Risk Channel</button>
+  <button data-tab="mc">Monte Carlo</button>
+</div></nav>
+
+<main class="container">
+
+<!-- OVERVIEW -->
+<section class="panel active" id="p-overview"><div class="card">
+  <h2>Synthetic data summary</h2>
+  <h3>Italian S.r.l. firms around statutory-auditor thresholds, 2015–2023</h3>
+  <div class="kpi-grid" id="stats"></div>
+  <div class="row">
+    <div class="plot" id="ov-dist"></div>
+    <div class="plot" id="ov-scatter"></div>
+  </div>
+</div></section>
+
+<!-- RD -->
+<section class="panel" id="p-rd"><div class="card">
+  <h2>Regression Discontinuity</h2>
+  <h3>Fuzzy compliance: auditor appointment probability jumps at the threshold; outcomes respond through monitoring → governance → meritocracy.</h3>
+  <div class="controls">
+    <div class="ctrl"><label>Year</label><select id="rd-year"><option>2023</option><option>2022</option><option>2021</option><option>2020</option><option>2019</option><option>2018</option><option>2017</option><option>2016</option><option>2015</option></select></div>
+    <div class="ctrl"><label>Bandwidth (|running| ≤ bw)</label><div class="range-row"><input type="range" id="rd-bw" min="0.3" max="3" step="0.1" value="1.5"><span class="val" id="rd-bw-v">1.5</span></div></div>
+    <div class="ctrl"><label>Outcome</label><select id="rd-outcome"><option value="auditor_dummy">Auditor (first stage)</option><option value="meritocracy_index">Meritocracy index</option><option value="wage_premium">Wage premium</option><option value="interest_rate">Interest rate</option><option value="productivity">Log productivity</option></select></div>
+    <div class="ctrl"><label>Bins (plot only)</label><div class="range-row"><input type="range" id="rd-bins" min="10" max="60" step="5" value="30"><span class="val" id="rd-bins-v">30</span></div></div>
+  </div>
+  <div class="plot" id="rd-plot" style="min-height:460px"></div>
+  <div class="kpi-grid" id="rd-stats"></div>
+  <div class="section-note">Dashed line = cutoff. Points = binned means. Lines = kernel-weighted local linear fits on raw data (triangular kernel). RD estimate = gap at cutoff.</div>
+</div></section>
+
+<!-- DiD -->
+<section class="panel" id="p-did"><div class="card">
+  <h2>Difference-in-Differences / Event Study</h2>
+  <h3>Reform in 2019 lowers the threshold; treated firms in a near-threshold band become newly covered.</h3>
+  <div class="controls">
+    <div class="ctrl"><label>Outcome</label><select id="did-outcome"><option value="meritocracy_index">Meritocracy index</option><option value="wage_premium">Wage premium</option><option value="interest_rate">Interest rate</option><option value="productivity">Log productivity</option></select></div>
+  </div>
+  <div class="plot" id="did-plot" style="min-height:460px"></div>
+  <div class="section-note">Treated = firms in the 13.80–14.00 log-assets band in 2018. Control = all other firms. Annotation shows simple DiD estimate: (post−pre) for treated minus (post−pre) for control.</div>
+</div></section>
+
+<!-- CREDIT -->
+<section class="panel" id="p-credit"><div class="card">
+  <h2>Credit risk channel</h2>
+  <h3>Monitoring reduces opacity → improved credit terms and lower downside risk.</h3>
+  <div class="controls">
+    <div class="ctrl"><label>X axis</label><select id="cr-x"><option value="governance_score">Governance score</option><option value="meritocracy_index">Meritocracy index</option><option value="leverage">Leverage</option></select></div>
+    <div class="ctrl"><label>Y axis</label><select id="cr-y"><option value="interest_rate">Interest rate</option><option value="default_risk">Default risk</option><option value="leverage">Leverage</option></select></div>
+    <div class="ctrl"><label>Color by</label><select id="cr-c"><option value="auditor_dummy">Auditor</option><option value="family_control">Family control</option><option value="distressed">Distressed</option></select></div>
+    <div class="ctrl"><label>Sample size</label><div class="range-row"><input type="range" id="cr-n" min="500" max="3000" step="250" value="1500"><span class="val" id="cr-n-v">1500</span></div></div>
+  </div>
+  <div class="plot" id="cr-plot" style="min-height:490px"></div>
+</div></section>
+
+<!-- MC -->
+<section class="panel" id="p-mc"><div class="card">
+  <h2>Monte Carlo simulation</h2>
+  <h3>Adjust structural parameters and watch the RD jump and productivity distributions respond in real time.</h3>
+  <div class="controls">
+    <div class="ctrl"><label>Auditor → governance</label><div class="range-row"><input type="range" id="mc-aud" min="0" max="2" step="0.1" value="0.85"><span class="val" id="mc-aud-v">0.85</span></div></div>
+    <div class="ctrl"><label>Governance → meritocracy</label><div class="range-row"><input type="range" id="mc-gov" min="0" max="1.5" step="0.05" value="0.55"><span class="val" id="mc-gov-v">0.55</span></div></div>
+    <div class="ctrl"><label>Meritocracy → productivity</label><div class="range-row"><input type="range" id="mc-mer" min="0" max="0.6" step="0.02" value="0.22"><span class="val" id="mc-mer-v">0.22</span></div></div>
+    <div class="ctrl"><label>Family control penalty</label><div class="range-row"><input type="range" id="mc-fam" min="0" max="1" step="0.05" value="0.45"><span class="val" id="mc-fam-v">0.45</span></div></div>
+    <div class="ctrl"><label>Firms</label><div class="range-row"><input type="range" id="mc-n" min="500" max="6000" step="500" value="2000"><span class="val" id="mc-n-v">2000</span></div></div>
+  </div>
+  <div class="row">
+    <div class="plot" id="mc-rd" style="min-height:390px"></div>
+    <div class="plot" id="mc-dist" style="min-height:390px"></div>
+  </div>
+  <div class="kpi-grid" id="mc-stats"></div>
+  <div class="section-note">Drag sliders during your oral exam to show how theory parameters map to observable RD patterns.</div>
+</div></section>
+
+</main>
+
+<footer>Hatef Tabbakhian — NPDE 42° cycle proposal preview — University of Naples Federico II — DISES / CSEF — 2026<br><span style="opacity:.5">All data are synthetic</span></footer>
+
+<script>
+/* ===================== PLOTLY CONFIG ===================== */
+const CFG={responsive:true,displaylogo:false,toImageButtonOptions:{format:"png",filename:"npde42",scale:2}};
+const C={accent:"#7c83ff",blue:"#5aa2ff",red:"#ff6b6b",muted:"#8892a8",text:"#e5e7ef"};
+const LB={paper_bgcolor:"rgba(0,0,0,0)",plot_bgcolor:"rgba(255,255,255,.02)",
+  font:{color:C.text,size:12,family:"DM Sans,system-ui,sans-serif"},
+  margin:{l:56,r:24,t:46,b:48},
+  xaxis:{gridcolor:"rgba(255,255,255,.07)",zerolinecolor:"rgba(255,255,255,.1)"},
+  yaxis:{gridcolor:"rgba(255,255,255,.07)",zerolinecolor:"rgba(255,255,255,.1)"},
+  hoverlabel:{bgcolor:"#0b0d14",bordercolor:"rgba(124,131,255,.3)",font:{size:12}}};
+
+/* Improvement 1: Plotly.react instead of newPlot after first render */
+function plot(id,data,layout){
+  const el=document.getElementById(id);
+  if(el&&el.classList.contains("js-plotly-plot"))Plotly.react(id,data,layout,CFG);
+  else Plotly.newPlot(id,data,layout,CFG);
+}
+
+/* Improvement 3: requestAnimationFrame throttle for sliders */
+function raf(fn){let s=false;return function(){if(s)return;s=true;requestAnimationFrame(()=>{s=false;fn()})}}
+
+const fI=new Intl.NumberFormat("en-US");
+const fP=new Intl.NumberFormat("en-US",{maximumFractionDigits:2});
+const fD=new Intl.NumberFormat("en-US",{maximumFractionDigits:4});
+
+/* ===================== DATA ENGINE ===================== */
+function sigmoid(x){return 1/(1+Math.exp(-x))}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function randn(rng){let u=0,v=0;while(!u)u=rng();while(!v)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+function generatePanel(seed,N){
+  const rng=mulberry32(seed),nrm=()=>randn(rng),firms=[];
+  for(let i=0;i<N;i++)firms.push({id:i+1,base:14+.6*nrm(),gr:.03+.02*nrm(),fam:rng()<.55?1:0,bd:Math.max(.01,Math.min(.99,.28+.15*nrm())),mq:nrm(),fe:.4*nrm(),gov:0});
+  const rows=[];
+  for(let yr=2015;yr<=2023;yr++){const t=yr-2015,thr=yr<=2018?14:13.8;
+    for(const f of firms){const la=f.base+f.gr*t+.15*nrm(),run=la-thr,pa=Math.min(.98,Math.max(.02,.1+.75*sigmoid(4*run))),aud=rng()<pa?1:0;
+      f.gov=.6*f.gov+.85*aud-.45*f.fam+.1*f.mq+.2*f.fe+.6*nrm();
+      const mer=.55*f.gov-.35*f.fam+.2*f.mq+.7*nrm(),prod=Math.exp(2+.22*mer+.05*f.gov+.2*f.fe+.25*nrm()),
+        lev=Math.min(.95,Math.max(.05,.35+.1*f.bd-.03*f.gov+.08*nrm())),
+        ir=Math.min(.25,Math.max(.005,.045-.0045*f.gov-.003*mer+.03*lev+.007*f.bd+.006*nrm())),
+        dr=sigmoid(-3.2+2.2*lev+7.5*ir-.35*f.gov-.1*Math.log(prod)+.4*nrm()),
+        wp=Math.min(.6,Math.max(-.1,.25-.08*mer+.05*f.fam+.08*nrm()));
+      rows.push({firm_id:f.id,year:yr,threshold:thr,log_assets:la,running:run,auditor_dummy:aud,governance_score:f.gov,meritocracy_index:mer,wage_premium:wp,productivity:prod,leverage:lev,interest_rate:ir,default_risk:dr,distressed:rng()<Math.min(.999,Math.max(.001,dr))?1:0,family_control:f.fam,bank_dependence:f.bd,post_reform:yr>=2019?1:0,log_assets_2018:0,treat_band:0})}}
+  const b={};rows.filter(r=>r.year===2018).forEach(r=>{b[r.firm_id]=r.log_assets});
+  rows.forEach(r=>{r.log_assets_2018=b[r.firm_id]??14;r.treat_band=(r.log_assets_2018>=13.8&&r.log_assets_2018<14)?1:0});
+  return rows;
+}
+const DATA=generatePanel(42,3000);
+const BY_YEAR=new Map();for(const r of DATA){if(!BY_YEAR.has(r.year))BY_YEAR.set(r.year,[]);BY_YEAR.get(r.year).push(r)}
+
+/* ===================== TAB NAV ===================== */
+document.querySelectorAll("nav button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("p-"+btn.dataset.tab).classList.add("active");
+    requestAnimationFrame(()=>{document.querySelectorAll(".plot").forEach(el=>{if(el.classList.contains("js-plotly-plot"))Plotly.Plots.resize(el)})});
+  });
+});
+
+/* ===================== OVERVIEW ===================== */
+(function(){
+  const cs=BY_YEAR.get(2023),N=new Set(DATA.map(r=>r.firm_id)).size;
+  const audR=cs.reduce((a,r)=>a+r.auditor_dummy,0)/cs.length;
+  const mMer=cs.reduce((a,r)=>a+r.meritocracy_index,0)/cs.length;
+  const mIR=cs.reduce((a,r)=>a+r.interest_rate,0)/cs.length;
+  document.getElementById("stats").innerHTML=[
+    {n:fI.format(DATA.length),l:"Total observations"},{n:fI.format(N),l:"Firms"},{n:"2015–2023",l:"Panel window"},
+    {n:fP.format(100*audR)+"%",l:"Auditor rate (2023)"},{n:fD.format(mMer),l:"Mean meritocracy (2023)"},{n:fP.format(100*mIR)+"%",l:"Mean interest rate (2023)"}
+  ].map(s=>`<div class="kpi"><div class="num">${s.n}</div><div class="lbl">${s.l}</div></div>`).join("");
+
+  plot("ov-dist",[{x:cs.map(r=>r.running),type:"histogram",nbinsx:60,marker:{color:C.accent,opacity:.75}}],
+    {...LB,title:"Distribution of running variable (2023)",xaxis:{...LB.xaxis,title:"Running (log assets − threshold)"},yaxis:{...LB.yaxis,title:"Count"},
+    shapes:[{type:"line",x0:0,x1:0,y0:0,y1:1,yref:"paper",line:{color:C.red,dash:"dash",width:2}}]});
+
+  const s=cs.filter((_,i)=>i%2===0);
+  plot("ov-scatter",[{x:s.map(r=>r.governance_score),y:s.map(r=>r.productivity),mode:"markers",
+    marker:{size:4,opacity:.5,color:s.map(r=>r.auditor_dummy?C.blue:C.red)},
+    text:s.map(r=>`Auditor: ${r.auditor_dummy}<br>Merit: ${r.meritocracy_index.toFixed(2)}<br>IR: ${(100*r.interest_rate).toFixed(2)}%`),hoverinfo:"text"}],
+    {...LB,title:"Governance vs productivity (2023)",xaxis:{...LB.xaxis,title:"Governance score"},yaxis:{...LB.yaxis,title:"Productivity"}});
+})();
+
+/* ===================== RD (Improvement 2: kernel-weighted local linear) ===================== */
+function triW(x,bw){const a=Math.abs(x);return a>bw?0:1-a/bw}
+function wlsLL(pts,bw){
+  let S0=0,S1=0,S2=0,T0=0,T1=0;
+  for(const p of pts){const w=triW(p.x,bw);if(w<=0)continue;S0+=w;S1+=w*p.x;S2+=w*p.x*p.x;T0+=w*p.y;T1+=w*p.x*p.y}
+  const d=(S0*S2-S1*S1)||1e-12;return{a:(T0*S2-T1*S1)/d,b:(T1*S0-T0*S1)/d}
+}
+function binMeans(pts,n){
+  const s=pts.slice().sort((a,b)=>a.x-b.x),bs=Math.max(6,Math.min(n,Math.floor(s.length/5))),sz=Math.max(1,Math.ceil(s.length/bs)),out=[];
+  for(let i=0;i<s.length;i+=sz){const c=s.slice(i,i+sz);out.push({x:c.reduce((a,p)=>a+p.x,0)/c.length,y:c.reduce((a,p)=>a+p.y,0)/c.length})}return out
+}
+
+const updateRD=raf(function(){
+  const yr=+document.getElementById("rd-year").value,bw=+document.getElementById("rd-bw").value,
+    outcome=document.getElementById("rd-outcome").value,bins=+document.getElementById("rd-bins").value;
+  document.getElementById("rd-bw-v").textContent=bw.toFixed(1);document.getElementById("rd-bins-v").textContent=bins;
+
+  const cs=BY_YEAR.get(yr).filter(r=>Math.abs(r.running)<=bw);
+  const yOf=r=>outcome==="productivity"?Math.log(r.productivity):r[outcome];
+  const rawL=cs.filter(r=>r.running<0).map(r=>({x:r.running,y:yOf(r)}));
+  const rawR=cs.filter(r=>r.running>=0).map(r=>({x:r.running,y:yOf(r)}));
+  const fL=wlsLL(rawL,bw),fR=wlsLL(rawR,bw);
+  const rd=fR.a-fL.a;
+  const bL=binMeans(rawL,bins),bR=binMeans(rawR,bins);
+  const gL=Array.from({length:60},(_,i)=>-bw+bw*(i/59)),gR=Array.from({length:60},(_,i)=>bw*(i/59));
+
+  plot("rd-plot",[
+    {x:bL.map(p=>p.x),y:bL.map(p=>p.y),mode:"markers",marker:{color:C.blue,size:7},showlegend:false},
+    {x:bR.map(p=>p.x),y:bR.map(p=>p.y),mode:"markers",marker:{color:C.red,size:7},showlegend:false},
+    {x:gL,y:gL.map(x=>fL.a+fL.b*x),mode:"lines",line:{color:C.blue,width:2.6},showlegend:false},
+    {x:gR,y:gR.map(x=>fR.a+fR.b*x),mode:"lines",line:{color:C.red,width:2.6},showlegend:false}
+  ],{...LB,title:`RD: ${outcome.replaceAll("_"," ")} (${yr})`,
+    xaxis:{...LB.xaxis,title:"Running variable"},yaxis:{...LB.yaxis,title:outcome==="productivity"?"Log productivity":outcome.replaceAll("_"," ")},
+    shapes:[{type:"line",x0:0,x1:0,y0:0,y1:1,yref:"paper",line:{color:"rgba(255,255,255,.3)",dash:"dash",width:1.5}}],
+    annotations:[{x:0,y:fR.a,text:`RD = ${fD.format(rd)}`,showarrow:true,arrowhead:2,ax:70,ay:-30,font:{color:C.accent,size:14}}]});
+
+  document.getElementById("rd-stats").innerHTML=
+    `<div class="kpi"><div class="num">${fD.format(rd)}</div><div class="lbl">RD estimate (kernel local linear)</div></div>`+
+    `<div class="kpi"><div class="num">${fI.format(cs.length)}</div><div class="lbl">Obs in bandwidth</div></div>`+
+    `<div class="kpi"><div class="num">${fI.format(rawL.length)} / ${fI.format(rawR.length)}</div><div class="lbl">Left / Right of cutoff</div></div>`+
+    `<div class="kpi"><div class="num">${bw.toFixed(1)}</div><div class="lbl">Bandwidth</div></div>`;
+});
+["rd-year","rd-bw","rd-outcome","rd-bins"].forEach(id=>document.getElementById(id).addEventListener("input",updateRD));
+updateRD();
+
+/* ===================== DiD (with simple DiD summary number) ===================== */
+const updateDiD=raf(function(){
+  const outcome=document.getElementById("did-outcome").value;
+  const yrs=[2015,2016,2017,2018,2019,2020,2021,2022,2023];
+  const yOf=r=>outcome==="productivity"?Math.log(r.productivity):r[outcome];
+  const mg=(tb)=>yrs.map(yr=>{const s=BY_YEAR.get(yr).filter(r=>r.treat_band===tb);return s.reduce((a,r)=>a+yOf(r),0)/s.length});
+  const ctrl=mg(0),treat=mg(1),diff=yrs.map((_,i)=>treat[i]-ctrl[i]);
+
+  const pre=yrs.map((y,i)=>y<=2018?i:-1).filter(i=>i>=0),post=yrs.map((y,i)=>y>=2019?i:-1).filter(i=>i>=0);
+  const mn=(a,ix)=>ix.reduce((s,i)=>s+a[i],0)/ix.length;
+  const did=(mn(treat,post)-mn(treat,pre))-(mn(ctrl,post)-mn(ctrl,pre));
+
+  plot("did-plot",[
+    {x:yrs,y:treat,mode:"lines+markers",name:"Treated",line:{color:C.red,width:2.6},marker:{size:8}},
+    {x:yrs,y:ctrl,mode:"lines+markers",name:"Control",line:{color:C.blue,width:2.6},marker:{size:8}},
+    {x:yrs,y:diff,mode:"lines+markers",name:"Treat − Control",line:{color:C.accent,width:2,dash:"dot"},marker:{size:6},yaxis:"y2"}
+  ],{...LB,title:`Event study: ${outcome.replaceAll("_"," ")}`,
+    xaxis:{...LB.xaxis,title:"Year"},yaxis:{...LB.yaxis,title:"Mean outcome"},
+    yaxis2:{title:"Treat − Control",overlaying:"y",side:"right",gridcolor:"transparent",tickfont:{color:C.accent}},
+    shapes:[{type:"line",x0:2019,x1:2019,y0:0,y1:1,yref:"paper",line:{color:"rgba(255,255,255,.3)",dash:"dash",width:1.5}}],
+    annotations:[{x:2021,y:Math.max(...treat),text:`Simple DiD ≈ ${fD.format(did)}`,showarrow:false,font:{color:C.accent,size:13}}],
+    legend:{x:.02,y:.98,bgcolor:"rgba(0,0,0,0)"}});
+});
+document.getElementById("did-outcome").addEventListener("input",updateDiD);
+updateDiD();
+
+/* ===================== CREDIT ===================== */
+const updateCredit=raf(function(){
+  const xk=document.getElementById("cr-x").value,yk=document.getElementById("cr-y").value,
+    ck=document.getElementById("cr-c").value,n=+document.getElementById("cr-n").value;
+  document.getElementById("cr-n-v").textContent=n;
+  const cs=BY_YEAR.get(2023).slice(0,n);
+  plot("cr-plot",[{x:cs.map(r=>r[xk]),y:cs.map(r=>r[yk]),mode:"markers",
+    marker:{size:5,opacity:.5,color:cs.map(r=>r[ck]?C.red:C.blue)},
+    text:cs.map(r=>`${ck}: ${r[ck]}<br>Gov: ${r.governance_score.toFixed(2)}<br>IR: ${(100*r.interest_rate).toFixed(2)}%`),hoverinfo:"text"}],
+    {...LB,title:`${xk.replaceAll("_"," ")} vs ${yk.replaceAll("_"," ")} (2023)`,
+    xaxis:{...LB.xaxis,title:xk.replaceAll("_"," ")},yaxis:{...LB.yaxis,title:yk.replaceAll("_"," ")}});
+});
+["cr-x","cr-y","cr-c","cr-n"].forEach(id=>document.getElementById(id).addEventListener("input",updateCredit));
+updateCredit();
+
+/* ===================== MONTE CARLO ===================== */
+const updateMC=raf(function(){
+  const aE=+document.getElementById("mc-aud").value,gM=+document.getElementById("mc-gov").value,
+    mP=+document.getElementById("mc-mer").value,fP2=+document.getElementById("mc-fam").value,
+    N=+document.getElementById("mc-n").value;
+  document.getElementById("mc-aud-v").textContent=aE.toFixed(2);document.getElementById("mc-gov-v").textContent=gM.toFixed(2);
+  document.getElementById("mc-mer-v").textContent=mP.toFixed(2);document.getElementById("mc-fam-v").textContent=fP2.toFixed(2);
+  document.getElementById("mc-n-v").textContent=N;
+
+  const rng=mulberry32(123),nrm=()=>randn(rng),res=[];
+  for(let i=0;i<N;i++){const la=14+.6*nrm(),run=la-13.9,fam=rng()<.55?1:0,
+    pa=Math.min(.98,Math.max(.02,.1+.75*sigmoid(4*run))),aud=rng()<pa?1:0,
+    gov=aE*aud-fP2*fam+.1*nrm()+.6*nrm(),mer=gM*gov-.35*fam+.7*nrm(),
+    prod=Math.exp(2+mP*mer+.05*gov+.25*nrm());
+    res.push({run,aud,mer,prod})}
+
+  const left=res.filter(r=>r.run<0&&r.run>-2).map(r=>({x:r.run,y:r.mer}));
+  const right=res.filter(r=>r.run>=0&&r.run<2).map(r=>({x:r.run,y:r.mer}));
+  plot("mc-rd",[
+    {x:binMeans(left,25).map(p=>p.x),y:binMeans(left,25).map(p=>p.y),mode:"markers",marker:{color:C.blue,size:7},showlegend:false},
+    {x:binMeans(right,25).map(p=>p.x),y:binMeans(right,25).map(p=>p.y),mode:"markers",marker:{color:C.red,size:7},showlegend:false}
+  ],{...LB,title:"Simulated RD: meritocracy at threshold",xaxis:{...LB.xaxis,title:"Running variable"},yaxis:{...LB.yaxis,title:"Meritocracy index"},
+    shapes:[{type:"line",x0:0,x1:0,y0:0,y1:1,yref:"paper",line:{color:"rgba(255,255,255,.3)",dash:"dash"}}]});
+
+  const aP=res.filter(r=>r.aud===1).map(r=>Math.log(r.prod)),nP=res.filter(r=>r.aud===0).map(r=>Math.log(r.prod));
+  plot("mc-dist",[
+    {x:nP,type:"histogram",nbinsx:40,name:"No auditor",marker:{color:C.blue,opacity:.65}},
+    {x:aP,type:"histogram",nbinsx:40,name:"With auditor",marker:{color:C.red,opacity:.65}}
+  ],{...LB,title:"Log productivity by auditor status",barmode:"overlay",
+    xaxis:{...LB.xaxis,title:"Log productivity"},yaxis:{...LB.yaxis,title:"Count"},
+    legend:{x:.02,y:.98,bgcolor:"rgba(0,0,0,0)"}});
+
+  const mean=a=>a.reduce((x,y)=>x+y,0)/Math.max(1,a.length),gap=mean(aP)-mean(nP);
+  document.getElementById("mc-stats").innerHTML=
+    `<div class="kpi"><div class="num">${fD.format(mean(aP))}</div><div class="lbl">Mean log prod (auditor)</div></div>`+
+    `<div class="kpi"><div class="num">${fD.format(mean(nP))}</div><div class="lbl">Mean log prod (no auditor)</div></div>`+
+    `<div class="kpi"><div class="num">${fD.format(gap)}</div><div class="lbl">Productivity gap</div></div>`+
+    `<div class="kpi"><div class="num">${fI.format(N)}</div><div class="lbl">Simulated firms</div></div>`;
+});
+["mc-aud","mc-gov","mc-mer","mc-fam","mc-n"].forEach(id=>document.getElementById(id).addEventListener("input",updateMC));
+updateMC();
+</script>
+</body>
+</html>

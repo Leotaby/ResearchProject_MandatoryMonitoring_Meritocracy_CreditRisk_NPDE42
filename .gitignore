@@ -1,0 +1,15 @@
+data/*.csv
+python/output/
+r/output/
+stata/output/
+cpp/output/
+cpp/build/
+__pycache__/
+*.pyc
+.venv/
+.Rhistory
+.RData
+*.o
+*.exe
+.DS_Store
+Thumbs.db
