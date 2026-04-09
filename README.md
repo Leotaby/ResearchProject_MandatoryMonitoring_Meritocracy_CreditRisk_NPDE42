@@ -9,8 +9,6 @@
 
 **[→ Open Interactive Dashboard](https://npde-proposal-preview.vercel.app)**
 
-![Overview](screenshots/overview.png)
-![RD Analysis](screenshots/rd_analysis.png)
 
 ## Overview
 
