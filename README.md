@@ -5,6 +5,13 @@
 
 ---
 
+## Live Demo
+
+**[→ Open Interactive Dashboard](https://npde-proposal-preview.vercel.app)**
+
+![Overview](screenshots/overview.png)
+![RD Analysis](screenshots/rd_analysis.png)
+
 ## Overview
 
 This repository is a fully reproducible mini-research project that previews the empirical core of my PhD proposal:
