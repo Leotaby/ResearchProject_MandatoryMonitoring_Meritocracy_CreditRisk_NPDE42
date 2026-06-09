@@ -112,9 +112,9 @@ All computation happens client-side using synthetic data generated on page load.
 
 ## Author
 
-**Hatef Tabbakhian** — tabbakhianhatef@gmail.com
+**Hatef Tabbakhian** - tabbakhianhatef@gmail.com
 [GitHub](https://github.com/leotaby) · [LinkedIn](https://linkedin.com/in/hateftaby)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
