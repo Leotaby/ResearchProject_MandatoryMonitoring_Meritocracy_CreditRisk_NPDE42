@@ -1,6 +1,5 @@
 # Mandatory Monitoring, Meritocracy, and Credit Risk in Italian Private Firms
 
-**Replication package for NPDE 42° cycle PhD proposal**
 *Hatef Tabbakhian — University of Naples Federico II (DISES / CSEF)*
 
 ---
